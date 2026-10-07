@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Manage your private video game collection and backlog." />
+  <title>GameShelf — Your collection</title>
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+  <a class="skip-link" href="#library-results">Skip to library results</a>
+  <header class="shell site-header">
+    <a class="brand" href="index.html" aria-label="GameShelf home">
+      <span class="brand-mark" aria-hidden="true">▦</span>
+      <span>GameShelf</span>
+    </a>
+    <nav aria-label="Main navigation">
+      <a href="index.html">Home</a>
+      <a aria-current="page" href="#library">Library</a>
+      <button class="nav-button" id="open-settings" type="button">Settings &amp; export</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="app-band" id="library">
+      <div class="shell">
+        <div class="app-heading">
+          <div>
+            <p class="eyebrow">Your collection</p>
+            <h1 class="page-title">Game library</h1>
+            <p class="page-intro">Private to this browser. Search, organize, and plan what to play next.</p>
+          </div>
+        </div>
+
+        <section class="library-controls" aria-labelledby="find-heading">
+          <h2 class="sr-only" id="find-heading">Find and filter games</h2>
+          <div class="primary-search-row">
+            <label class="search-input">
+              <span aria-hidden="true">⌕</span>
+              <span class="sr-only">Search your library</span>
+              <input id="search-games" type="search" maxlength="100" placeholder="Search title, edition, platform, or tags" autocomplete="off" />
+              <button class="clear-search" id="clear-search" type="button" aria-label="Clear search" hidden>×</button>
+            </label>
+            <button class="button secondary filter-toggle" id="filter-toggle" type="button" aria-expanded="false" aria-controls="filter-panel">Filters</button>
+          </div>
+
+          <div class="quick-filters">
+            <label><span>Platform</span><select id="platform-filter"><option value="all">All platforms</option></select></label>
+            <label><span>Play status</span><select id="status-filter">
+              <option value="all">All statuses</option>
+              <option value="backlog">Unplayed / backlog</option>
+              <option value="playing">Playing</option>
+              <option value="paused">Paused</option>
+              <option value="completed">Completed</option>
+              <option value="abandoned">Abandoned</option>
+            </select></label>
+            <label><span>Sort by</span><select id="sort-games">
+              <option value="title-asc">Title A–Z</option>
+              <option value="title-desc">Title Z–A</option>
+              <option value="added-desc">Recently added</option>
+              <option value="added-asc">Oldest added</option>
+              <option value="updated-desc">Recently updated</option>
+              <option value="rating-desc">Rating high–low</option>
+              <option value="year-desc">Release year newest</option>
+              <option value="platform-asc">Platform A–Z</option>
+            </select></label>
+            <button class="icon-button" id="toggle-view" type="button" aria-label="Switch to list view" title="Switch view">☷</button>
+          </div>
+
+          <div class="filter-panel" id="filter-panel" hidden>
+            <label><span>Ownership</span><select id="ownership-filter">
+              <option value="all">All ownership</option><option value="owned">Owned</option><option value="wishlist">Wishlist</option><option value="borrowed">Borrowed</option><option value="lent">Lent</option><option value="subscription">Subscription</option><option value="sold_traded">Sold / traded</option>
+            </select></label>
+            <label><span>Format</span><select id="format-filter">
+              <option value="all">All formats</option><option value="physical">Physical</option><option value="digital">Digital</option><option value="streaming">Streaming</option><option value="unknown">Unknown</option>
+            </select></label>
+            <label><span>Favorite</span><select id="favorite-filter">
+              <option value="all">All games</option><option value="yes">Favorites only</option><option value="no">Not favorites</option>
+            </select></label>
+            <label><span>Minimum rating</span><select id="rating-filter">
+              <option value="0">Any rating</option><option value="1">1+ stars</option><option value="2">2+ stars</option><option value="3">3+ stars</option><option value="4">4+ stars</option><option value="5">5 stars</option>
+            </select></label>
+            <label><span>Minimum completion</span><input id="completion-filter" type="number" min="0" max="100" placeholder="0–100%" /></label>
+            <label><span>Release year from</span><input id="year-filter" type="number" min="1950" max="2031" placeholder="e.g. 2020" /></label>
+            <label><span>Tag</span><select id="tag-filter"><option value="all">All tags</option></select></label>
+          </div>
+
+          <div class="active-filter-row" id="active-filter-row" hidden>
+            <div class="filter-chips" id="filter-chips" aria-label="Active filters"></div>
+            <button class="text-button" id="clear-filters" type="button">Clear all filters</button>
+          </div>
+        </section>
+
+        <section class="stats" aria-label="Library statistics">
+          <div class="stat"><span id="total-count">0</span><small>Total games</small></div>
+          <div class="stat"><span id="playing-count">0</span><small>In progress</small></div>
+          <div class="stat"><span id="backlog-count">0</span><small>Backlog</small></div>
+          <div class="stat"><span id="favorite-count">0</span><small>Favorites</small></div>
+        </section>
+
+        <button class="button add-game-action" id="open-add" type="button">+ Add game</button>
+
+        <div class="library-meta">
+          <p id="result-count" aria-live="polite">0 matching</p>
+          <div class="library-meta-actions">
+            <label class="page-size-label">Show <select id="page-size"><option value="25">25</option><option value="50">50</option><option value="100">100</option></select></label>
+            <button class="text-button" id="show-trash" type="button">Trash</button>
+          </div>
+        </div>
+
+        <div class="game-grid" id="library-results" aria-live="polite"></div>
+
+        <div class="empty-state" id="empty-state" hidden>
+          <span aria-hidden="true">✦</span>
+          <h2 id="empty-title">No games found</h2>
+          <p id="empty-copy">Try a different search or filter.</p>
+          <div class="empty-actions">
+            <button class="button secondary" id="empty-clear" type="button">Clear search and filters</button>
+            <button class="button" id="empty-add" type="button">Add a game</button>
+          </div>
+        </div>
+
+        <nav class="pagination" id="pagination" aria-label="Library pages"></nav>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="catalog-dialog" id="catalog-dialog">
+    <div class="catalog-modal-heading">
+      <div><p class="eyebrow">Game catalog</p><h2>Build your backlog</h2><p>Search 100 games and add one to your personal backlog.</p></div>
+      <button class="close-button" id="close-catalog" type="button" aria-label="Close game catalog">×</button>
+    </div>
+    <div class="catalog-toolbar">
+      <label class="search-input"><span aria-hidden="true">⌕</span><span class="sr-only">Search game catalog</span><input id="catalog-search" type="search" placeholder="Search by title, platform, genre, or year" /></label>
+      <select id="catalog-platform" aria-label="Filter catalog by platform"><option value="all">All platforms</option></select>
+    </div>
+    <div class="catalog-meta"><span class="catalog-count" id="catalog-count">100 games</span><button class="text-button" id="manual-add" type="button">Can’t find your game?</button></div>
+    <div class="catalog-grid" id="catalog-grid" aria-live="polite"></div>
+  </dialog>
+
+  <dialog class="entry-dialog" id="entry-dialog">
+    <form id="entry-form" novalidate>
+      <div class="dialog-heading">
+        <div><p class="eyebrow" id="entry-kicker">New entry</p><h2 id="entry-heading">Add a game</h2><p class="form-help">Only title and platform are required.</p></div>
+        <button class="close-button" id="close-entry" type="button" aria-label="Close game form">×</button>
+      </div>
+
+      <div class="error-summary" id="error-summary" tabindex="-1" hidden><strong>Please fix the following:</strong><ul id="error-list"></ul></div>
+      <div class="duplicate-warning" id="duplicate-warning" hidden><strong>Possible duplicate</strong><p id="duplicate-copy"></p><button class="button secondary compact" id="save-duplicate" type="button">Save anyway</button></div>
+      <input type="hidden" name="id" />
+
+      <fieldset>
+        <legend>Game identity</legend>
+        <div class="form-grid">
+          <label class="span-2">Title <span aria-hidden="true">*</span><input name="title" required maxlength="200" /></label>
+          <label>Platform <span aria-hidden="true">*</span><select name="platform" required>
+            <option value="">Choose a platform</option><option>Switch</option><option>PC</option><option>PlayStation 5</option><option>PlayStation 4</option><option>Xbox Series X|S</option><option>Xbox One</option><option>Steam Deck</option><option>Nintendo 3DS</option><option>Other</option>
+          </select></label>
+          <label id="custom-platform-wrap" hidden>Custom platform <span aria-hidden="true">*</span><input name="customPlatform" maxlength="80" /></label>
+          <label>Edition <input name="edition" maxlength="120" placeholder="Standard, Collector’s…" /></label>
+          <label>Release year <input name="releaseYear" type="number" min="1950" max="2031" /></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Collection status</legend>
+        <div class="form-grid">
+          <label>Play status <select name="status"><option value="backlog">Unplayed / backlog</option><option value="playing">Playing</option><option value="paused">Paused</option><option value="completed">Completed</option><option value="abandoned">Abandoned</option></select></label>
+          <label>Ownership <select name="ownership"><option value="owned">Owned</option><option value="wishlist">Wishlist</option><option value="borrowed">Borrowed</option><option value="lent">Lent</option><option value="subscription">Subscription</option><option value="sold_traded">Sold / traded</option></select></label>
+          <label>Format <select name="format"><option value="unknown">Unknown</option><option value="physical">Physical</option><option value="digital">Digital</option><option value="streaming">Streaming</option></select></label>
+          <label>Rating <select name="rating"><option value="">Not rated</option><option value="5">5 — Excellent</option><option value="4">4 — Great</option><option value="3">3 — Good</option><option value="2">2 — Fair</option><option value="1">1 — Poor</option></select></label>
+          <label>Completion <div class="input-suffix"><input name="completionPercent" type="number" min="0" max="100" /><span>%</span></div></label>
+          <label>Hours played <input name="hoursPlayed" type="number" min="0" max="999999.9" step="0.1" /></label>
+          <label class="checkbox-label"><input name="favorite" type="checkbox" /> Mark as favorite</label>
+          <label class="span-2">Tags <input name="tags" maxlength="820" placeholder="cozy, rpg, co-op (up to 20)" /></label>
+        </div>
+      </fieldset>
+
+      <details class="optional-fields">
+        <summary>Acquisition, dates, and notes</summary>
+        <div class="form-grid optional-grid">
+          <label>Purchase date <input name="purchaseDate" type="date" /></label>
+          <label>Acquired from <input name="acquiredFrom" maxlength="160" /></label>
+          <label>Purchase price <input name="purchasePrice" type="number" min="0" step="0.01" /></label>
+          <label>Currency <select name="currency"><option>USD</option><option>CAD</option><option>EUR</option><option>GBP</option><option>JPY</option><option>AUD</option></select></label>
+          <label>Started on <input name="startedOn" type="date" /></label>
+          <label>Completed on <input name="completedOn" type="date" /></label>
+          <label class="span-2">Notes <textarea name="notes" rows="5" maxlength="10000" placeholder="Private notes about this copy or playthrough"></textarea></label>
+        </div>
+      </details>
+
+      <div class="dialog-actions sticky-actions">
+        <button class="button secondary" id="cancel-entry" type="button">Cancel</button>
+        <button class="button" type="submit" id="save-entry">Save game</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="detail-dialog" id="detail-dialog">
+    <div class="dialog-heading">
+      <div><p class="eyebrow">Game details</p><h2 id="detail-title">Game</h2><p id="detail-subtitle"></p></div>
+      <button class="close-button" id="close-detail" type="button" aria-label="Close game details">×</button>
+    </div>
+    <div class="detail-content" id="detail-content"></div>
+    <div class="dialog-actions">
+      <button class="button danger secondary" id="detail-trash" type="button">Move to trash</button>
+      <button class="button" id="detail-edit" type="button">Edit game</button>
+    </div>
+  </dialog>
+
+  <dialog class="confirm-dialog" id="confirm-dialog">
+    <form method="dialog">
+      <p class="eyebrow">Please confirm</p>
+      <h2 id="confirm-title">Confirm action</h2>
+      <p id="confirm-copy"></p>
+      <div class="dialog-actions"><button class="button secondary" value="cancel">Cancel</button><button class="button danger" id="confirm-action" value="default">Confirm</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="settings-dialog" id="settings-dialog">
+    <div class="dialog-heading">
+      <div><p class="eyebrow">Preferences</p><h2>Settings &amp; data</h2></div>
+      <button class="close-button" id="close-settings" type="button" aria-label="Close settings">×</button>
+    </div>
+    <section class="settings-section">
+      <h3>Library preferences</h3>
+      <div class="form-grid">
+        <label>Default view <select id="preference-view"><option value="grid">Grid</option><option value="list">List</option></select></label>
+        <label>Default page size <select id="preference-page-size"><option value="25">25</option><option value="50">50</option><option value="100">100</option></select></label>
+      </div>
+      <button class="button secondary compact" id="save-preferences" type="button">Save preferences</button>
+    </section>
+    <section class="settings-section">
+      <h3>Export your data</h3>
+      <p>Download active and trashed entries, tags, timestamps, and preferences.</p>
+      <div class="settings-actions"><button class="button secondary" id="export-json" type="button">Export JSON</button><button class="button secondary" id="export-csv" type="button">Export CSV</button></div>
+    </section>
+    <section class="settings-section danger-zone">
+      <h3>Reset local prototype</h3>
+      <p>Erase this browser’s saved library and restore the starter collection.</p>
+      <button class="button danger secondary" id="reset-library" type="button">Reset local data</button>
+    </section>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <footer>
+    <div class="shell"><span>© 2026 GameShelf</span><p>Your library stays in this browser in this prototype.</p></div>
+  </footer>
+  <script src="scripts/app.js"></script>
+</body>
+</html>
+
