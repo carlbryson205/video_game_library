@@ -801,3 +801,4 @@ window.addEventListener("popstate", function () { applyUrlState(); render(); });
 applyUrlState();
 populateCatalogPlatforms();
 render();
+

@@ -1518,3 +1518,4 @@ These are target paths, not claims about existing files.
 - [ ] Threat model, privacy inventory, accessibility spec, and retention policy are approved.
 - [ ] Migration, rollback, restore, purge, export, and account-deletion procedures are rehearsed.
 - [ ] Dogfood, beta, and GA gates have named approvers and stored evidence.
+
